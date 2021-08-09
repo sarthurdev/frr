@@ -958,6 +958,26 @@ DEFUN_NOSH (rpki,
 	return CMD_SUCCESS;
 }
 
+DEFUN (no_rpki,
+       no_rpki_cmd,
+       "no rpki",
+       NO_STR
+       DEBUG_STR
+       "Set rpki back to defaults\n")
+{
+	if (is_running())
+		stop();
+
+	rpki_debug = 0;
+	polling_period = POLLING_PERIOD_DEFAULT;
+	expire_interval = EXPIRE_INTERVAL_DEFAULT;
+	retry_interval = RETRY_INTERVAL_DEFAULT;
+
+	list_delete_all_node(cache_list);
+
+	return CMD_SUCCESS;
+}
+
 DEFUN (bgp_rpki_start,
        bgp_rpki_start_cmd,
        "rpki start",
@@ -1497,6 +1517,8 @@ static void install_cli_commands(void)
 	install_default(RPKI_NODE);
 	install_element(CONFIG_NODE, &rpki_cmd);
 	install_element(ENABLE_NODE, &rpki_cmd);
+	install_element(CONFIG_NODE, &no_rpki_cmd);
+	install_element(ENABLE_NODE, &no_rpki_cmd);
 
 	install_element(ENABLE_NODE, &bgp_rpki_start_cmd);
 	install_element(ENABLE_NODE, &bgp_rpki_stop_cmd);
